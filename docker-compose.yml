@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+    service1-db:
+      image: postgres:17
+      container_name: service1-postgres
+      environment:
+        POSTGRES_DB: service1_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: 1111
+      ports:
+        - "5432:5432" # change port
+      volumes:
+        - service1_db_data:/var/lib/postgresql/data
+      networks:
+        - PROJECT-NAME-network
+
+    service1:
+      build:
+        context: "./service1"
+        dockerfile: Dockerfile
+      container_name: service1
+      ports:
+        - "8001:8001"
+      depends_on:
+        - service1-db
+      environment:
+        - DB_HOST=service1-db
+        - DB_PORT=5432
+        - DB_NAME=service1_db
+        - DB_USER=postgres
+        - DB_PASSWORD=1111
+      networks:
+        - PROJECT-NAME-network
+
+volumes:
+  service1_db_data:
+
+networks:
+  PROJECT-NAME-network:
+    driver: bridge
